@@ -1,0 +1,33 @@
+# https://cloud.google.com/appengine/docs/flexible/custom-runtimes/configuring-your-app-with-app-yaml#intro
+service: default
+runtime: custom
+env: flex
+
+manual_scaling:
+   instances: 1 # important as dekart designed to work on single instance
+
+resources:
+   memory_gb: 2.0 # recommended to handle up to 1M points
+
+service_account: "kepler-dakart@kiwibot-atlas.iam.gserviceaccount.com"
+
+env_variables:
+  DEKART_LOG_DEBUG: "1"
+  DEKART_POSTGRES_DB: "dekart"
+  DEKART_POSTGRES_USER: "postgres"
+  DEKART_POSTGRES_PASSWORD: "omNabcI2td9rafKI"
+  DEKART_POSTGRES_PORT: "5432"
+  # see https://cloud.google.com/sql/docs/mysql/connect-app-engine-flexible
+  DEKART_STORAGE: "GCS"
+  DEKART_DATASOURCE: "BQ"
+  DEKART_POSTGRES_HOST: "172.17.0.1"
+  DEKART_CLOUD_STORAGE_BUCKET: "kiwibot-dakart"
+  DEKART_BIGQUERY_PROJECT_ID: "kiwibot-atlas"
+  DEKART_BIGQUERY_MAX_BYTES_BILLED: "53687091200"
+  DEKART_MAPBOX_TOKEN: "pk.eyJ1IjoiZnJlZGhpaSIsImEiOiJjanV2d3ZobHkwNmUwNDNxeGViYW4xOW1rIn0.fwOAZtA0NV0Hf0BKNEvhqw"
+  DEKART_CORS_ORIGIN: "*"
+#   DEKART_DATA_ENCRYPTION_KEY: "YWSQwpL0ja++ofcEguymG5R7ynAuLS96XfvFNz59HFY="
+
+beta_settings:
+  # see https://cloud.google.com/sql/docs/mysql/connect-app-engine-flexible
+   cloud_sql_instances: "kiwibot-atlas:us-central1:atlas-quipu=tcp:5432"

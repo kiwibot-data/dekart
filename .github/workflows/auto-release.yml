@@ -1,0 +1,125 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  auto_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Get version from .version file
+        id: version
+        run: |
+          if [ ! -f ".version" ]; then
+            echo "Error: .version file not found" >&2
+            exit 1
+          fi
+          VERSION=$(cat .version | tr -d '\n\r' | xargs)
+          if [ -z "$VERSION" ]; then
+            echo "Error: .version file is empty" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      - name: Create annotated tag and push
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git fetch --tags --force origin
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid version format: $VERSION" >&2
+            exit 1
+          fi
+          TAG="v$VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Validate tag does not exist on remote to avoid race conditions
+          if git ls-remote --tags --exit-code origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists" >&2
+            exit 1
+          fi
+          git tag -a "$TAG" -m "Release $TAG (auto-generated from PR merge)"
+          git push origin "$TAG"
+
+      - name: Check if this is the first tag
+        id: check_tags
+        run: |
+          TAG_COUNT=$(git tag --list | wc -l)
+          echo "tag_count=$TAG_COUNT" >> $GITHUB_OUTPUT
+          if [ "$TAG_COUNT" -eq 1 ]; then
+            echo "is_first_tag=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_first_tag=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog for first tag
+        id: changelog_first
+        if: steps.check_tags.outputs.is_first_tag == 'true'
+        run: |
+          echo "Generating changelog for first tag..."
+          ROOT=$(git rev-list --max-parents=0 HEAD | tail -1)
+          CHANGELOG="## What's Changed\n\n### Initial Release\n\nThis is the initial release of the project.\n\n### All Changes\n\n"
+          CHANGELOG+="$(git log --oneline --no-merges | head -20 | sed 's/^/- /')\n\n"
+          CHANGELOG+="*Full changelog: https://github.com/${{ github.repository }}/compare/${ROOT}...v${{ steps.version.outputs.version }}*\n"
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update CHANGELOG from Conventional Commits
+        id: changelog
+        if: steps.check_tags.outputs.is_first_tag == 'false'
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: v${{ steps.version.outputs.version }}
+
+      - name: Set changelog output
+        id: final_changelog
+        run: |
+          if [ "${{ steps.check_tags.outputs.is_first_tag }}" = "true" ]; then
+            echo "changes<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ steps.changelog_first.outputs.changes }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "changes<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ steps.changelog.outputs.changes }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          name: v${{ steps.version.outputs.version }}
+          body: ${{ steps.final_changelog.outputs.changes }}
+          token: ${{ github.token }}
+          tag: v${{ steps.version.outputs.version }}
+
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for v${{ steps.version.outputs.version }} [skip ci]'
+          file_pattern: CHANGELOG.md
+
+      - name: Note
+        run: |
+          echo "Created tag v${{ steps.version.outputs.version }}, generated changelog, and published GitHub Release."
