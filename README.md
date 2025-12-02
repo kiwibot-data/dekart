@@ -92,60 +92,70 @@ Ensure this service account has the following permissions:
 
 ## Building from Source
 
-If you need to build Dekart from source instead of using the pre-built Docker image:
+If you need to build Dekart from source instead of using the pre-built Docker image, follow these steps to build and push to Google Artifact Registry.
 
-### 1. Build the Dekart Application
+### 1. Create Artifact Registry Repository (one-time setup)
+
+```bash
+gcloud artifacts repositories create dekart \
+  --repository-format=docker \
+  --location=us-central1 \
+  --project=kiwibot-atlas
+```
+
+### 2. Configure Docker Authentication
+
+```bash
+gcloud auth configure-docker us-central1-docker.pkg.dev
+```
+
+### 3. Build the Docker Image
+
+Build from the `dekart` folder with the correct platform for App Engine:
 
 ```bash
 cd dekart
-# Install dependencies
-npm install
-
-# Build the frontend
-npm run build
-
-# Build the Go backend
-go build -o dekart ./src/server
+docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:latest .
 ```
 
-### 2. Create Custom Docker Image
+> **Note**: The `--platform linux/amd64` flag is required when building on Apple Silicon (M1/M2/M3) Macs, as App Engine runs on linux/amd64.
 
-```dockerfile
-# Custom Dockerfile for building from source
-FROM node:18-alpine AS frontend-builder
-WORKDIR /app
-COPY dekart/package*.json ./
-RUN npm ci
-COPY dekart/src/client ./src/client
-COPY dekart/vite.config.js ./
-RUN npm run build
-
-FROM golang:1.21-alpine AS backend-builder
-WORKDIR /app
-COPY dekart/go.mod dekart/go.sum ./
-RUN go mod download
-COPY dekart/src ./src
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dekart ./src/server
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=frontend-builder /app/dist ./dist
-COPY --from=backend-builder /app/dekart .
-EXPOSE 8080
-CMD ["./dekart"]
-```
-
-### 3. Deploy Custom Build
+### 4. Push to Artifact Registry
 
 ```bash
-# Build and push to Google Container Registry
-docker build -t gcr.io/your-project-id/dekart-custom .
-docker push gcr.io/your-project-id/dekart-custom
+docker push us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:latest
+```
 
-# Update app.yaml to use custom image
-# Then deploy
+### 5. Deploy to App Engine
+
+```bash
+cd ..
 gcloud app deploy app.yaml
+```
+
+### Quick Reference (All Steps)
+
+```bash
+# Full build and deploy workflow
+cd dekart
+docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:latest .
+docker push us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:latest
+cd ..
+gcloud app deploy app.yaml
+```
+
+### Using Version Tags
+
+Instead of `latest`, you can use version tags for better tracking:
+
+```bash
+docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:0.19.5 .
+docker push us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:0.19.5
+```
+
+Then update `Dockerfile` to reference the specific version:
+```dockerfile
+FROM us-central1-docker.pkg.dev/kiwibot-atlas/dekart/dekart:0.19.5
 ```
 
 ## Monitoring and Maintenance
@@ -229,3 +239,4 @@ This project uses Dekart, which is licensed under the GNU Affero General Public 
 Current version: 1.0.0
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
+
