@@ -68,7 +68,7 @@
 
 .header {
     padding: 5px 10px 5px 0px;
-    background: linear-gradient(180deg, #2B323B 70%, #25272F 100%);
+    background: var(--header-bg-gradient);
     position: relative;
     z-index: 1000;
 }
@@ -116,14 +116,26 @@
 
 a.dekartLink {
     display: block;
-    width: 76px;
-    height: 18px;
+    width: 120px;
+    height: 32px;
 }
 .dekartTitle {
-    width: 76px;
-    height: 18px;
+    width: 120px;
+    height: 32px;
     display: block;
     background-size: contain;
-    background-image: url('./dekart-title.svg');
+    background-position: center;
+    /* Custom logo - override --custom-logo-url via DEKART_HTML_CUSTOM_CODE */
+    background-image: var(--custom-logo-url);
+    background-repeat: no-repeat;
+}
+
+/* Custom logo class - when custom logo URL is provided */
+.customLogo {
+    width: 120px;
+    height: 32px;
+    display: block;
+    background-size: contain;
+    background-position: center;
     background-repeat: no-repeat;
 }

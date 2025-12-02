@@ -27,6 +27,7 @@ import UpgradeModal from './UpgradeModal'
 import WorkspaceReadOnlyBanner from './WorkspaceReadOnlyBanner'
 import styles from './App.module.css'
 import { hideUpgradeModal } from './actions/upgradeModal'
+import useTheme from './hooks/useTheme'
 
 // RedirectState reads states passed in the URL from the server
 function RedirectState () {
@@ -199,6 +200,9 @@ export default function App () {
   const userDefinedConnection = useSelector(state => state.connection.userDefined)
   const dispatch = useDispatch()
   const visitedPages = React.useRef(['/'])
+
+  // Apply custom theme and branding from env vars
+  useTheme()
   const storageLoaded = useSelector(state => state.storage.loaded)
   const page401 = window.location.pathname.startsWith('/401')
   const upgradeModalVisible = useSelector(state => state.upgradeModal.visible)

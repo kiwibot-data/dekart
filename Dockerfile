@@ -2,7 +2,7 @@ FROM node:18 AS nodedeps
 WORKDIR /source
 ADD package.json .
 ADD package-lock.json .
-ADD .npmrc .
+# ADD .npmrc .
 ADD Makefile .
 ADD proto proto
 ENV CI=true
