@@ -130,12 +130,29 @@ a.dekartLink {
     background-repeat: no-repeat;
 }
 
-/* Custom logo class - when custom logo URL is provided */
-.customLogo {
-    width: 120px;
-    height: 32px;
+/* Company logo in center - uses --custom-logo-url */
+.companyLogo {
+    width: 140px;
+    height: 36px;
     display: block;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    background-image: var(--custom-logo-url);
+}
+
+/* Small "Dekart" text link with version tooltip */
+.poweredBy {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    margin-left: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.poweredBy:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
 }

@@ -14,6 +14,9 @@ import { switchPlayground } from './actions/user'
 import localStorageReset from './actions/localStorage'
 import { GlobalOutlined, LockOutlined } from '@ant-design/icons'
 import { track } from './lib/tracking'
+import packageJson from '../../package.json'
+
+const APP_VERSION = packageJson.version
 
 function getSignature (email) {
   if (!email) {
@@ -173,9 +176,19 @@ export function Header ({ buttons, title, queryParams }) {
       <div className={styles.top}>
         <div className={styles.left}>
           <DekartMenu />
+          <Tooltip title={`Powered by Dekart v${APP_VERSION}`}>
+            <a
+              target='_blank'
+              rel='noopener noreferrer'
+              href={homePage}
+              className={styles.poweredBy}
+            >
+              Dekart
+            </a>
+          </Tooltip>
         </div>
         <div className={styles.middle}>
-          {title ? (<div className={styles.titleWrap}><div className={styles.title}>{title}</div></div>) : (<div className={styles.dekartLinkHolder}><a target='_blank' rel='noopener noreferrer' className={styles.dekartLink} href={homePage}><span className={styles.dekartTitle} /></a></div>)}
+          {title ? (<div className={styles.titleWrap}><div className={styles.title}>{title}</div></div>) : (<div className={styles.dekartLinkHolder}><span className={styles.companyLogo} /></div>)}
         </div>
         <div className={styles.buttons}>{buttons || null}</div>
         <User buttonDivider={Boolean(buttons)} />
