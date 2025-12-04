@@ -12,8 +12,8 @@ import { useSelector } from 'react-redux'
  * - DEKART_UX_FONT_URL: URL to custom font (woff2)
  */
 export function useTheme() {
-  const env = useSelector(state => state.env)
-  const { variables, loaded } = env
+  const env = useSelector(state => state.env) || {}
+  const { variables = {}, loaded = false } = env
 
   useEffect(() => {
     if (!loaded) return
