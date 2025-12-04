@@ -4,30 +4,40 @@ runtime: custom
 env: flex
 
 manual_scaling:
-   instances: 1 # important as dekart designed to work on single instance
+    instances: 1 # important as dekart designed to work on single instance
 
 resources:
-   memory_gb: 2.0 # recommended to handle up to 1M points
+    memory_gb: 2.0 # recommended to handle up to 1M points
 
 service_account: "kepler-dakart@kiwibot-atlas.iam.gserviceaccount.com"
 
 env_variables:
-  DEKART_LOG_DEBUG: "1"
-  DEKART_POSTGRES_DB: "dekart"
-  DEKART_POSTGRES_USER: "postgres"
-  DEKART_POSTGRES_PASSWORD: "omNabcI2td9rafKI"
-  DEKART_POSTGRES_PORT: "5432"
-  # see https://cloud.google.com/sql/docs/mysql/connect-app-engine-flexible
-  DEKART_STORAGE: "GCS"
-  DEKART_DATASOURCE: "BQ"
-  DEKART_POSTGRES_HOST: "172.17.0.1"
-  DEKART_CLOUD_STORAGE_BUCKET: "kiwibot-dakart"
-  DEKART_BIGQUERY_PROJECT_ID: "kiwibot-atlas"
-  DEKART_BIGQUERY_MAX_BYTES_BILLED: "53687091200"
-  DEKART_MAPBOX_TOKEN: "pk.eyJ1IjoiZnJlZGhpaSIsImEiOiJjanV2d3ZobHkwNmUwNDNxeGViYW4xOW1rIn0.fwOAZtA0NV0Hf0BKNEvhqw"
-  DEKART_CORS_ORIGIN: "*"
-#   DEKART_DATA_ENCRYPTION_KEY: "YWSQwpL0ja++ofcEguymG5R7ynAuLS96XfvFNz59HFY="
+    DEKART_LOG_DEBUG: "1"
+    DEKART_POSTGRES_DB: "dekart"
+    DEKART_POSTGRES_USER: "postgres"
+    DEKART_POSTGRES_PASSWORD: "omNabcI2td9rafKI"
+    DEKART_POSTGRES_PORT: "5432"
+    # see https://cloud.google.com/sql/docs/mysql/connect-app-engine-flexible
+    DEKART_STORAGE: "GCS"
+    DEKART_DATASOURCE: "BQ"
+    DEKART_POSTGRES_HOST: "172.17.0.1"
+    DEKART_CLOUD_STORAGE_BUCKET: "kiwibot-dakart"
+    DEKART_BIGQUERY_PROJECT_ID: "kiwibot-atlas"
+    DEKART_BIGQUERY_MAX_BYTES_BILLED: "53687091200"
+    DEKART_MAPBOX_TOKEN: "pk.eyJ1IjoiZnJlZGhpaSIsImEiOiJjanV2d3ZobHkwNmUwNDNxeGViYW4xOW1rIn0.fwOAZtA0NV0Hf0BKNEvhqw"
+    DEKART_CORS_ORIGIN: "*"
+    # DEKART_DATA_ENCRYPTION_KEY: "YWSQwpL0ja++ofcEguymG5R7ynAuLS96XfvFNz59HFY="
+    # IAP Authentication
+    DEKART_REQUIRE_IAP: "1"
+    DEKART_IAP_JWT_AUD: "/projects/862961741611/apps/kiwibot-atlas"
+    # Workspaces + User Management
+    DEKART_ALLOW_WORKSPACE_CREATION: "1"
+    DEKART_DEFAULT_WORKSPACE_ADMIN: "fredy.acuna@kiwibot.com"
+    DEKART_DEFAULT_WORKSPACE_ROLE: "editor"
+    # File uploads
+    DEKART_ALLOW_FILE_UPLOAD: "1"
+    DEKART_HTML_CUSTOM_CODE: "<style>@font-face{font-family:'Yellix';src:url('https://storage.googleapis.com/kiwibot-assets/YelliRegular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}:root,:root[data-theme='light']{--font-family:'Yellix',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--color-primary:#262626;--color-accent:#FFF65D;--color-bg:#FFFFFF;--color-surface:#F5F5F5;--color-border:#E8E7E5;--color-text:#262626;--color-text-secondary:#666666;--color-success:#22c55e;--color-error:#ef4444;--color-warning:#f59e0b;--color-info:#3b82f6;--shadow-sm:0 2px 8px rgba(38,38,38,0.08);--shadow-md:0 4px 16px rgba(38,38,38,0.12);--shadow-lg:0 8px 32px rgba(38,38,38,0.16)}#company-logo{background-image:url('https://storage.googleapis.com/kiwibot-assets/logo.png') !important}</style>"
 
 beta_settings:
-  # see https://cloud.google.com/sql/docs/mysql/connect-app-engine-flexible
-   cloud_sql_instances: "kiwibot-atlas:us-central1:atlas-quipu=tcp:5432"
+    # see https://cloud.google.com/sql/docs/mysql/connect-app-engine-flexible
+    cloud_sql_instances: "kiwibot-atlas:us-central1:atlas-quipu=tcp:5432"

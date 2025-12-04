@@ -1,0 +1,3 @@
+[submodule "dekart"]
+	path = dekart
+	url = git@github.com:kiwibot-data/dekart.git
