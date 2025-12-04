@@ -188,7 +188,7 @@ export function Header ({ buttons, title, queryParams }) {
           </Tooltip>
         </div>
         <div className={styles.middle}>
-          {title ? (<div className={styles.titleWrap}><div className={styles.title}>{title}</div></div>) : (<div className={styles.dekartLinkHolder}><span className={styles.companyLogo} /></div>)}
+          {title ? (<div className={styles.titleWrap}><div className={styles.title}>{title}</div></div>) : (<div className={styles.dekartLinkHolder}><span id="company-logo" className={styles.companyLogo} /></div>)}
         </div>
         <div className={styles.buttons}>{buttons || null}</div>
         <User buttonDivider={Boolean(buttons)} />
